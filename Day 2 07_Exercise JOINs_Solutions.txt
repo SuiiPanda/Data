@@ -1,0 +1,54 @@
+
+-- Task 1
+USE THEATRE
+-- Select a distinct list of the names of any theatre groups
+-- that have performed either Wicked or Chicago
+SELECT DISTINCT GroupName --*
+FROM TheatreGroup t
+JOIN Performance  p ON t.GroupID=p.GroupID
+WHERE --ShowName = 'Wicked' OR ShowName = 'Chicago'
+      ShowName IN ('Wicked', 'Chicago')
+
+
+
+-- Task 2
+-- Select region name, group name, date started, and director surname
+-- for all theatre groups started in 2007, 2008 or 2009.
+-- Order the results by group name within region name
+SELECT r.RegionName, t.GroupName,
+       CAST(t.DateStarted AS DATE) AS 'Date Started',
+       YEAR(DateStarted) AS 'Year Started',
+       p.FirstName + ' ' + p.Surname AS 'Director Name'
+FROM TheatreGroup t
+JOIN Region       r ON t.RegionID=r.RegionID
+JOIN Performer    p ON t.Director=p.MembershipID
+WHERE --YEAR(DateStarted) BETWEEN 2007 AND 2009         -- this clause will NOT be able to use an index
+      --DATEPART(yyyy, DateStarted) IN (2007,2008,2009) -- this clause will NOT be able to use an index
+      --DateStarted >= '01/01/2007' AND DateStarted <= '12/31/2009'
+      --DateStarted >= '2007-01-01' AND DateStarted <= '2009-12-31'
+        DateStarted BETWEEN '2007-01-01' AND '2009-12-31'
+ORDER BY RegionName, GroupName
+
+
+
+-- Task 3
+-- List group id, name, and theatre name of all theatre groups
+-- in the 'LONDON' region
+SELECT GroupID, GroupName, TheatreName
+FROM TheatreGroup t
+JOIN Region       r ON t.RegionID=r.RegionID
+WHERE RegionName = 'LONDON'
+
+
+-- Task 4
+-- List show name, group name, and region name of all shows
+-- that contain 'Stage Combat' and 'Modern Dance' skills
+-- Exclude duplicates
+SELECT DISTINCT pf.ShowName, tg.GroupName, r.RegionName--, s.SkillName
+FROM Skill s
+JOIN PerformerSkill ps ON s.SkillID       = ps.SkillID
+JOIN Performer      p  ON ps.MembershipID = p.MembershipID
+JOIN TheatreGroup   tg ON p.GroupID       = tg.GroupID
+JOIN Performance    pf ON tg.GroupID      = pf.GroupID
+JOIN Region         r  ON tg.RegionID     = r.RegionID
+WHERE s.SkillName IN ('Stage Combat', 'Modern Dance')
