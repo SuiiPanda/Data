@@ -1,9 +1,7 @@
 USE master
 GO
 
-IF EXISTS (SELECT * FROM sysdatabases WHERE NAME = 'LanguageSchool')
-	ALTER DATABASE LanguageSchool SET SINGLE_USER WITH ROLLBACK IMMEDIATE
-	DROP DATABASE LanguageSchool
+DROP DATABASE IF EXISTS LanguageSchool
 GO
 
 CREATE DATABASE LanguageSchool
